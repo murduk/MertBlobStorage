@@ -1,6 +1,7 @@
 name: Parallel Multi-Platform Build & Merge
 
 on:
+  workflow_dispatch: # Enables manual trigger
   push:
     branches: [ "main" ]
     tags: [ 'v*.*.*' ]
