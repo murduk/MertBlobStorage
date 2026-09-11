@@ -1,0 +1,67 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/blobstore-core",
+    "crates/blobstore-storage",
+    "crates/blobstore-auth",
+    "crates/blobstore-xml",
+    "crates/blobstore-api",
+    "crates/blobstore-server",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = ["Mert Ozdag <mert.ozdag@gmail.com>"]
+
+[workspace.dependencies]
+blobstore-core = { path = "crates/blobstore-core" }
+blobstore-storage = { path = "crates/blobstore-storage" }
+blobstore-auth = { path = "crates/blobstore-auth" }
+blobstore-xml = { path = "crates/blobstore-xml" }
+blobstore-api = { path = "crates/blobstore-api" }
+
+tokio = { version = "1", features = ["full"] }
+axum = { version = "0.7", features = ["macros"] }
+axum-server = { version = "0.8", features = ["tls-rustls"] }
+tower = "0.4"
+tower-http = { version = "0.5", features = ["trace"] }
+hyper = { version = "1", features = ["full"] }
+
+sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "sqlite", "migrate"] }
+
+quick-xml = { version = "0.31", features = ["serialize"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+jsonwebtoken = "9"
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+
+hmac = "0.12"
+sha2 = "0.10"
+md-5 = "0.10"
+base64 = "0.22"
+hex = "0.4"
+uuid = { version = "1", features = ["v4"] }
+time = { version = "0.3", features = ["formatting", "parsing", "macros"] }
+
+thiserror = "1"
+anyhow = "1"
+
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+figment = { version = "0.10", features = ["toml", "env"] }
+clap = { version = "4", features = ["derive"] }
+
+bytes = "1"
+futures = "0.3"
+tokio-util = { version = "0.7", features = ["io"] }
+async-trait = "0.1"
+rand = "0.8"
+urlencoding = "2"
+
+[profile.release]
+lto = true
+codegen-units = 1

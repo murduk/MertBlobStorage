@@ -1,0 +1,37 @@
+# Example configuration for MertBlobStorage. Copy this file, adjust it, and
+# point the server at it with `--config path/to/your.toml`. Every value here
+# can also be overridden via environment variables prefixed `MBS_`, using `__`
+# to separate nested keys, e.g. `MBS_SERVER__LISTEN_ADDR=0.0.0.0:9000`.
+
+[server]
+listen_addr = "0.0.0.0:8443"
+tls_enabled = false
+# tls_cert_path = "/etc/mertblobstorage/tls/cert.pem"
+# tls_key_path = "/etc/mertblobstorage/tls/key.pem"
+
+[storage]
+root_path = "./data"
+metadata_db_path = "./data/metadata.sqlite3"
+
+# Add one or more accounts. If this list is empty, the server generates a
+# throwaway development account (`devstoreaccount1`) on startup and logs its
+# key — fine for trying things out, but add real entries here for anything
+# you need to survive a restart.
+#
+# [[accounts]]
+# name = "myaccount"
+# key1 = "<base64-encoded key, e.g. `openssl rand -base64 32`>"
+# key2 = ""
+
+[oidc]
+enabled = false
+issuer = "https://login.example-oidc-provider.com/tenant-id/v2.0"
+audience = "api://mertblobstorage"
+jwks_uri = "https://login.example-oidc-provider.com/tenant-id/discovery/v2.0/keys"
+jwks_cache_ttl_seconds = 3600
+
+[logging]
+format = "pretty" # "json" for production
+level = "info"
+
+service_version = "2021-08-06"

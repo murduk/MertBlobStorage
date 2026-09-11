@@ -1,0 +1,15 @@
+[package]
+name = "blobstore-xml"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+blobstore-core = { workspace = true }
+blobstore-storage = { workspace = true }
+quick-xml = { workspace = true }
+serde = { workspace = true }
+time = { workspace = true }
+
+[dev-dependencies]
