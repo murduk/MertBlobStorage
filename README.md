@@ -39,6 +39,30 @@ If you don't configure any `[[accounts]]`, the server generates a throwaway
 convenient for trying things out, but add a real entry to your config for
 anything that needs to survive a restart.
 
+### Docker
+
+```sh
+docker build -t mertblobstorage .
+docker run -d --name mertblobstorage \
+  -p 8443:8443 \
+  -v mbs-data:/app/data \
+  mertblobstorage
+```
+
+Or with Compose:
+
+```sh
+docker compose up -d
+```
+
+The image runs as a non-root user, exposes port `8443` (plaintext by
+default — see `config/default.toml` to enable TLS by mounting a cert/key and
+setting `server.tls_enabled = true`), and stores everything under `/app/data`,
+which you should mount as a volume. Override the built-in config by mounting
+your own file over `/app/config/default.toml` (see the commented-out line in
+`docker-compose.yml`) or by setting `MBS_*` environment variables — e.g.
+`-e MBS_ACCOUNTS__0__NAME=myaccount -e MBS_ACCOUNTS__0__KEY1=<base64 key>`.
+
 ### Connecting Azure Storage Explorer
 
 Use "Connect to a resource using a connection string" (or "Attach to a local

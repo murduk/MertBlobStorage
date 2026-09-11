@@ -1,0 +1,10 @@
+target
+data
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+.git
+.github
+docs
+*.md
+.DS_Store
