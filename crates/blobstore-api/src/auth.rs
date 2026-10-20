@@ -198,19 +198,11 @@ fn verify_shared_key(
         if_unmodified_since: header_str(headers, "if-unmodified-since"),
         range: header_str(headers, "range"),
         x_ms_headers,
-        // `shared_key::canonicalized_resource` prepends "/{account}" itself, so
-        // this must be the path *after* the account segment (e.g. "/container/blob"),
-        // not the full request path.
-        canonical_path: {
-            let full = req.uri().path();
-            let after_account = full
-                .strip_prefix('/')
-                .and_then(|p| p.strip_prefix(account))
-                .unwrap_or(full);
-            // Account-level requests (e.g. List Containers) canonicalize to
-            // just "/{account}" with no trailing slash.
-            after_account.to_string()
-        },
+        // `shared_key::canonicalized_resource` prepends "/{account}" itself. With
+        // path-style endpoints (http://host:port/{account}/...) Azure SDKs sign the
+        // *full* URL path as the resource, i.e. "/{account}/{account}/container/blob",
+        // so pass the request path through unchanged.
+        canonical_path: req.uri().path().to_string(),
         query_params: query_params.to_vec(),
     };
 
