@@ -9,7 +9,7 @@ use base64::engine::general_purpose::STANDARD as B64;
 use base64::Engine;
 use blobstore_api::AppState;
 use blobstore_auth::bearer::{JwksCache, OidcConfig as AuthOidcConfig};
-use blobstore_storage::FsBackend;
+use blobstore_storage::{FsBackend, StorageBackend};
 use clap::Parser;
 use rand::RngCore;
 
@@ -56,6 +56,15 @@ async fn main() -> anyhow::Result<()> {
         }
     }
 
+    if let Some(default_account) = &cfg.server.default_account {
+        if backend.account_keys(default_account).await.is_none() {
+            tracing::warn!(
+                account = %default_account,
+                "server.default_account names an account that does not exist; requests relying on it will fail authentication"
+            );
+        }
+    }
+
     let oidc: Option<Arc<JwksCache>> = if cfg.oidc.enabled {
         Some(JwksCache::new(AuthOidcConfig {
             issuer: cfg.oidc.issuer.clone(),
@@ -79,6 +88,7 @@ async fn main() -> anyhow::Result<()> {
         oidc,
         service_version: cfg.service_version.clone(),
         service_endpoint,
+        default_account: cfg.server.default_account.clone(),
     };
 
     let app = blobstore_api::build_router(state);

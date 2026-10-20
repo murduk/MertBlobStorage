@@ -65,6 +65,24 @@ mod tests {
     }
 
     #[test]
+    fn path_style_resource_repeats_the_account() {
+        // Path-style endpoint: SDKs sign the URL path "/myaccount/mycontainer"
+        // and the account is prepended once more.
+        let mut req = base_request();
+        req.canonical_path = "/myaccount/mycontainer".to_string();
+        let sts = string_to_sign("myaccount", &req);
+        assert!(sts.ends_with("/myaccount/myaccount/mycontainer\ncomp:list\nrestype:container"));
+    }
+
+    #[test]
+    fn host_style_resource_has_the_account_once() {
+        // Host-style / default-account request: URL path is "/mycontainer".
+        let req = base_request();
+        let sts = string_to_sign("myaccount", &req);
+        assert!(sts.ends_with("\n/myaccount/mycontainer\ncomp:list\nrestype:container"));
+    }
+
+    #[test]
     fn verify_rejects_wrong_signature() {
         let req = base_request();
         let key = "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=";

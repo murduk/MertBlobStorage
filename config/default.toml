@@ -6,6 +6,10 @@
 [server]
 listen_addr = "0.0.0.0:8443"
 tls_enabled = false
+# Account used when a request's path and Host header don't name one. Azure SDKs
+# pointed at `http://<hostname>:<port>/<account>` drop the account path segment
+# for non-IP hosts, so set this when clients connect by hostname.
+# default_account = "myaccount"
 # tls_cert_path = "/etc/mertblobstorage/tls/cert.pem"
 # tls_key_path = "/etc/mertblobstorage/tls/key.pem"
 

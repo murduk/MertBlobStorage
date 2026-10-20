@@ -72,6 +72,19 @@ emulator" style custom endpoint) with:
 DefaultEndpointsProtocol=http;AccountName=<account>;AccountKey=<key1>;BlobEndpoint=http://<host>:<port>/<account>;
 ```
 
+### Endpoint styles
+
+The server works out the account for each request in this order:
+
+1. **Path-style**: `http://host:port/{account}/container/blob`, which is what
+   SDKs send when the endpoint host is an IP address.
+2. **Host-style**: `http://{account}.host:port/container/blob`, matching
+   Azure's `{account}.blob.core.windows.net`.
+3. **Default account**: `server.default_account` (`MBS_SERVER__DEFAULT_ACCOUNT`).
+   Set this when clients connect by plain hostname, e.g.
+   `BlobEndpoint=http://mertblobstorage:8443/myaccount`. The .NET SDK drops
+   the `/myaccount` segment for non-IP hosts and sends `/container/blob`.
+
 ### Connecting azcopy / SDKs
 
 Any Azure Blob SDK client configured with a Shared Key, SAS, or bearer

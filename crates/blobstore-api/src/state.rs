@@ -11,4 +11,6 @@ pub struct AppState {
     pub service_version: String,
     /// Base URL used to fill `ServiceEndpoint` attributes in list responses.
     pub service_endpoint: String,
+    /// Account used when neither the path nor the `Host` header names one.
+    pub default_account: Option<String>,
 }

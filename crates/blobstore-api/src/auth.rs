@@ -13,6 +13,7 @@ use blobstore_auth::{
 use blobstore_core::{AzureError, AzureErrorCode};
 use uuid::Uuid;
 
+use crate::account_resolve::SignedPath;
 use crate::error_response::azure_error_response;
 use crate::query::{self, parse_query};
 use crate::state::AppState;
@@ -198,11 +199,16 @@ fn verify_shared_key(
         if_unmodified_since: header_str(headers, "if-unmodified-since"),
         range: header_str(headers, "range"),
         x_ms_headers,
-        // `shared_key::canonicalized_resource` prepends "/{account}" itself. With
-        // path-style endpoints (http://host:port/{account}/...) Azure SDKs sign the
-        // *full* URL path as the resource, i.e. "/{account}/{account}/container/blob",
-        // so pass the request path through unchanged.
-        canonical_path: req.uri().path().to_string(),
+        // `shared_key::canonicalized_resource` prepends "/{account}" itself, and
+        // Azure SDKs sign the URL path exactly as sent: "/{account}/container" for
+        // path-style endpoints (giving "/{account}/{account}/container"), or
+        // "/container" for host-style ones. If `account_resolve` inserted the
+        // account segment, sign the path as the client sent it.
+        canonical_path: req
+            .extensions()
+            .get::<SignedPath>()
+            .map(|p| p.0.clone())
+            .unwrap_or_else(|| req.uri().path().to_string()),
         query_params: query_params.to_vec(),
     };
 

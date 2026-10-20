@@ -10,6 +10,11 @@ pub struct ServerConfig {
     pub tls_enabled: bool,
     pub tls_cert_path: Option<PathBuf>,
     pub tls_key_path: Option<PathBuf>,
+    /// Account for requests whose path and `Host` header name no known account
+    /// (e.g. Azure SDKs pointed at `http://hostname:port/{account}`, which drop
+    /// the path segment for non-IP hosts).
+    #[serde(default)]
+    pub default_account: Option<String>,
 }
 
 impl Default for ServerConfig {
@@ -19,6 +24,7 @@ impl Default for ServerConfig {
             tls_enabled: false,
             tls_cert_path: None,
             tls_key_path: None,
+            default_account: None,
         }
     }
 }

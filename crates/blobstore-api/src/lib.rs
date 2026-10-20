@@ -4,6 +4,7 @@
 //! extensions (attached by the middleware), never which of Shared
 //! Key/SAS/anonymous/bearer produced it.
 
+mod account_resolve;
 mod auth;
 mod error_response;
 mod handlers;
@@ -15,6 +16,7 @@ pub use state::AppState;
 
 use axum::routing::{get, put};
 use axum::Router;
+use tower::Layer;
 use tower_http::trace::TraceLayer;
 
 pub fn build_router(state: AppState) -> Router {
@@ -38,11 +40,19 @@ pub fn build_router(state: AppState) -> Router {
             state.clone(),
             auth::auth_middleware,
         ))
-        .with_state(state);
+        .with_state(state.clone());
+
+    // Account resolution has to run before route matching (it may insert the
+    // account segment), so it wraps the api router as a whole.
+    let api_service = axum::middleware::from_fn_with_state(
+        state,
+        account_resolve::account_resolve_middleware,
+    )
+    .layer(api_routes);
 
     Router::new()
         .route("/healthz", get(handlers::health::healthz))
         .route("/readyz", get(handlers::health::readyz))
-        .merge(api_routes)
+        .fallback_service(api_service)
         .layer(TraceLayer::new_for_http())
 }
