@@ -257,7 +257,11 @@ fn verify_sas(
         return Err(AzureErrorCode::AuthorizationFailure.into());
     };
 
-    sas::verify_signature(account, container, blob, params, key1, key2).map_err(map_auth_error)?;
+    // A container SAS (sr=c) is signed over the container only, yet authorizes
+    // every blob inside it; only a blob SAS (sr=b) includes the blob name.
+    let signed_blob = if params.sr == "c" { None } else { blob };
+    sas::verify_signature(account, container, signed_blob, params, key1, key2)
+        .map_err(map_auth_error)?;
     sas::check_validity_window(params).map_err(map_auth_error)?;
 
     if !sas::resource_scope_matches(params, is_blob_scope) {

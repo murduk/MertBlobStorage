@@ -159,12 +159,12 @@ pub fn has_permission(p: &SasParams, required: char) -> bool {
 }
 
 /// Whether the SAS's `sr` (signed resource) allows the requested scope: a
-/// container-scoped SAS (`sr=c`) only authorizes container-level operations
-/// (including listing), while a blob-scoped SAS (`sr=b`) only authorizes
+/// container-scoped SAS (`sr=c`) authorizes container-level operations and
+/// every blob within the container, while a blob-scoped SAS (`sr=b`) only authorizes
 /// operations on that specific blob.
 pub fn resource_scope_matches(p: &SasParams, requesting_blob: bool) -> bool {
     match p.sr.as_str() {
-        "c" => !requesting_blob,
+        "c" => true,
         "b" => requesting_blob,
         _ => false,
     }
