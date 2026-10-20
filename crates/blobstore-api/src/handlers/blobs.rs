@@ -204,8 +204,10 @@ pub async fn blob_get(
                 return Ok((StatusCode::OK, resp_headers).into_response());
             }
 
+            // Azure SDKs send `x-ms-range`, which takes precedence over `Range`.
             let range = headers
-                .get(axum::http::header::RANGE)
+                .get("x-ms-range")
+                .or_else(|| headers.get(axum::http::header::RANGE))
                 .and_then(|v| v.to_str().ok())
                 .and_then(parse_range);
 
